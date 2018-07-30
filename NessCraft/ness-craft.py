@@ -4,6 +4,7 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import getpass
 import json
+from time import sleep
 import argparse
 import sys
 
@@ -22,8 +23,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 #
 ###################
 
-NESSUS_INSTANCE = "https://localhost:8834"
-INPUT_FILENAME = "tmp.txt"
+NESSUS_INSTANCE = ""
+INPUT_FILENAME = ""
 VERBOSE = False
 CHUNKS = 0
 HEADER = ""
