@@ -121,7 +121,7 @@ def main():
 	
 	scans = retrieve_scans()
 	retrieve_export_request(scans)
-	print("[+] Downloads Complete")
+	print("\n[+] Downloads Complete")
 
 
 
