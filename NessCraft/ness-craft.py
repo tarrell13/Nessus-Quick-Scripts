@@ -106,7 +106,7 @@ def chunk_input_file():
 
 	host_list = []
 
-	with open("tmp.txt") as handle:
+	with open(INPUT_FILENAME) as handle:
 		for line in handle:
 			host_list.append(line.strip("\n"))
 
