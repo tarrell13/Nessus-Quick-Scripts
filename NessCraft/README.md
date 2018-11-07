@@ -21,6 +21,8 @@ optional arguments:
   -i INPUT_FILE, --input-file INPUT_FILE
                         Input File containing IP addresses/Hostnames to create
                         scans from
+  -p PREFIX, --prefix PREFIX
+                        Scans Prefix Name used for Scan, Default Name is Scan
 
 ```
 ### In the codeblock below, we have an IP list 'tmp.txt' that has a total of 25 IP addresses.
