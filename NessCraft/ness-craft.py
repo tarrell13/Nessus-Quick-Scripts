@@ -28,7 +28,8 @@ INPUT_FILENAME = ""
 VERBOSE = False
 CHUNKS = 0
 HEADER = ""
-TOTAL_SCAN_COUNT = 0 
+TOTAL_SCAN_COUNT = 0
+PREFIX = ""
 
 # Add argument parse information here
 
@@ -37,6 +38,7 @@ parser.add_argument("-v", "--verbose", help="Increase Output Verbosity", action=
 parser.add_argument("-c", "--chunks", help="Creates scans in specified chunks", type=int, default=0)
 parser.add_argument("-n", "--nessus", help="Points script to specified Nessus Instance", required=True)
 parser.add_argument("-i", "--input-file", help="Input File containing IP addresses/Hostnames to create scans from", required=True)
+parser.add_argument("-p", "--prefix", help="Scans Prefix Name used for Scan, Default Name is Scan", type=str, default="Scan")
 args = parser.parse_args()
 
 
@@ -48,6 +50,9 @@ if args.chunks:
 
 if args.verbose:
 	VERBOSE = True
+
+if args.prefix:
+        PREFIX = args.prefix
 
 
 # Function to log into Nessus Instance using Username and Password
@@ -180,13 +185,13 @@ def create_scans(scan_list, host_list):
 
 		current_scan_count += 1
 		fields["settings"]["text_targets"] = string_targets(targets)
-		fields["settings"]["name"] = "Scan - %d" %current_scan_count
+		fields["settings"]["name"] = "%s - %d" %(PREFIX, current_scan_count)
 		hmm = requests.post(NESSUS_INSTANCE+"/scans", headers=HEADER, data=json.dumps(fields), verify=False)
 		
 		if hmm.status_code == 200:
 			TOTAL_SCAN_COUNT += 1
 			if VERBOSE:
-				print("[+] Scan - %d Created" %current_scan_count)
+				print("[+] %s - %d Created" %(PREFIX, current_scan_count))
 
 		else:
 			print("[!] Something went wrong 'Scan - %d' => %s" %(current_scan_count, hmm.content))
