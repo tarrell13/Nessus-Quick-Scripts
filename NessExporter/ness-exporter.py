@@ -78,9 +78,11 @@ def retrieve_export_request(scan_list):
 	increment = 0
 
 	print("[*] Save Directory: %s" %PATH)
+        print("[*] Formats => " + str(FORMATS))
 	print("[*] Downloading Files....")
 
 	for name,id in scan_list.iteritems():
+                for format in FORMATS:  
 			if format == "nessus" or format == "csv":
 				export_request = json.loads(requests.post(NESSUS_INSTANCE+"/scans/%s/export" %str(id), headers=HEADERS, verify=False, data=json.dumps({"format": format})).content)["token"]
                         elif format == "pdf" or format == "html":
@@ -88,8 +90,8 @@ def retrieve_export_request(scan_list):
 
 			export_request_check(name,id,export_request, format)
 		
-		increment += 1
-		progress.progress(increment, len(scan_list))
+	        increment += 1
+	        progress.progress(increment, len(scan_list))
 
 
 def export_request_check(name,id,file_request,format):
