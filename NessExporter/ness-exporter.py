@@ -7,6 +7,7 @@ import getpass
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import json
+import re
 import progress
 
 # Disable Insecure Warnings
@@ -17,11 +18,24 @@ HEADERS = ""
 parser = argparse.ArgumentParser(description="Script will download all scans in every format")
 parser.add_argument("-n", "--nessus", help="Points Script to Nessus Instance", default="https://localhost:8834")
 parser.add_argument("-p", "--path", default="/home/%s/Downloads" %getpass.getuser(), help="Path to save downloaded files")
+parser.add_argument("-f", "--formats", help="Specify format, nessus, pdf, html, csv, default is all")
 args = parser.parse_args()
 
 NESSUS_INSTANCE = args.nessus
 PATH = args.path
+FORMATS = []
 
+if args.formats:
+    if re.search(",",args.formats):
+        formats = str(args.formats).split(",")
+        
+        for format in formats:
+            FORMATS.append(str(format))
+    else:
+        FORMATS.append(args.formats)
+
+else:
+    FORMATS = ["nessus", "pdf", "html", "csv"]
 
 # Function is used to login to the Nessus Instance
 def nessus_login():
@@ -61,19 +75,16 @@ def retrieve_scans():
 
 def retrieve_export_request(scan_list):
 
-	formats = ["nessus", "pdf", "html", "csv"]
-
 	increment = 0
 
 	print("[*] Save Directory: %s" %PATH)
 	print("[*] Downloading Files....")
 
 	for name,id in scan_list.iteritems():
-		for format in formats:
-			if format is"nessus" or format is "csv":
-				export_request = json.loads(requests.post(NESSUS_INSTANCE+"/scans/%s/export" %str(id), headers=HEADERS, verify=False, data=json.dumps({"format": format})).content)["file"]
-			elif format is "pdf" or format is "html":
-				export_request = json.loads(requests.post(NESSUS_INSTANCE+"/scans/%s/export" %str(id), headers=HEADERS, verify=False, data=json.dumps({"format" : format, "chapters" : "vuln_hosts_summary"})).content)["file"]
+			if format == "nessus" or format == "csv":
+				export_request = json.loads(requests.post(NESSUS_INSTANCE+"/scans/%s/export" %str(id), headers=HEADERS, verify=False, data=json.dumps({"format": format})).content)["token"]
+                        elif format == "pdf" or format == "html":
+				export_request = json.loads(requests.post(NESSUS_INSTANCE+"/scans/%s/export" %str(id), headers=HEADERS, verify=False, data=json.dumps({"format" : format, "chapters" : "vuln_hosts_summary"})).content)["token"]
 
 			export_request_check(name,id,export_request, format)
 		
@@ -84,7 +95,7 @@ def retrieve_export_request(scan_list):
 def export_request_check(name,id,file_request,format):
 
 	while True:
-		if json.loads(requests.get(NESSUS_INSTANCE+"/scans/%s/export/%s/status" %(str(id), str(file_request)), verify=False, headers=HEADERS).content)["status"] == "ready":
+		if json.loads(requests.get(NESSUS_INSTANCE+"/tokens/%s/status" %(str(file_request)), verify=False, headers=HEADERS).content)["status"] == "ready":
 			download_file_request(name,id,file_request,format)
 			break
 		else:
@@ -92,7 +103,7 @@ def export_request_check(name,id,file_request,format):
 
 def download_file_request(name,id, file_request,format):
 
-	download = requests.get(NESSUS_INSTANCE+"/scans/%s/export/%s/download" %(str(id), str(file_request)), verify=False, headers=HEADERS)
+	download = requests.get(NESSUS_INSTANCE+"/tokens/%s/download" %(str(file_request)), verify=False, headers=HEADERS)
 
 	if format == "nessus":
 		with open(PATH+"/%s.nessus" %name, "wb") as handle:
