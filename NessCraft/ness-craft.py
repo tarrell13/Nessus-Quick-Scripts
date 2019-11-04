@@ -200,6 +200,26 @@ def create_scans(scan_list, host_list):
 				print("[-] POST Data for 'Scan - %d' => %s" %(current_scan_count, json.dumps(fields, separators=(",",":"))))	
 		
 	
+def check_nessus_version():
+
+	r = requests.post(NESSUS_INSTANCE+"/server/properties", headers=HEADER, verify=False)
+
+	if r.status_code == 200:
+		version = json.loads(r.content)['nessus_type']
+		server = float(json.loads(r.content)['server_version'])
+
+		if server >= 8 and version.lower() == 'nessus manager':
+			return True
+		elif server < 8:
+			return True 
+		else:
+			return False 
+
+	else:
+		return False
+
+
+
 def main():
 
 	global HEADER 
@@ -208,9 +228,13 @@ def main():
 		  "Content-Type": "application/json"}
 
 	
-	groups = chunk_input_file()
-	create_scans(pull_current_scans(),groups)
-	print("[+] Total Scans Created: %d" %TOTAL_SCAN_COUNT)
+	if check_nessus_version():
+		groups = chunk_input_file()
+		create_scans(pull_current_scans(),groups)
+		print("[+] Total Scans Created: %d" %TOTAL_SCAN_COUNT)
+	else:
+		print("[!] Scanner needs to be Nessus Manager")
+
 	sys.exit()
 
 	    
