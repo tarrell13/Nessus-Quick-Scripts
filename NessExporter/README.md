@@ -37,6 +37,29 @@ python ness-exporter.py -n https://localhost:8834 -p ~/Downloads/ -f nessus,html
 
 ```
 
+### Download Scan Reports from Selected Folder
+
+```
+[*] Log into Nessus Instance => https://localhost:8834
+=========================================================
+[*] Username: user
+[*] Password: 
+[+] Authentication Successful
+==============
+NESSUS FOLDERS 
+==============
+ID [ 3  ] :: My Scans
+ID [ 12  ] :: Test
+Choose Folder ID: 12
+
+
+[*] Save Directory: .
+[*] Formats => ['nessus', 'pdf', 'html', 'csv']
+[*] Downloading Files....
+[============================================================] 100.0% ...
+
+```
+
 
 
 

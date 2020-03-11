@@ -8,6 +8,7 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import json
 import re
+import sys
 import progress
 
 # Disable Insecure Warnings
@@ -19,11 +20,16 @@ parser = argparse.ArgumentParser(description="Script will download all scans in 
 parser.add_argument("-n", "--nessus", help="Points Script to Nessus Instance", default="https://localhost:8834")
 parser.add_argument("-p", "--path", default="/home/%s/Downloads" %getpass.getuser(), help="Path to save downloaded files")
 parser.add_argument("-f", "--formats", help="Specify format, nessus, pdf, html, csv, default is all")
+parser.add_argument("--folder",help="Download scans from a folder",action="store_true")
 args = parser.parse_args()
 
 NESSUS_INSTANCE = args.nessus
 PATH = args.path
 FORMATS = []
+FOLDER = False
+
+if args.folder:
+	FOLDER = True
 
 if args.formats:
     if re.search(",",args.formats):
@@ -60,11 +66,14 @@ def nessus_login():
 
 
 # Function will retrieve list of scans
-def retrieve_scans():
+def retrieve_scans(folderid=None):
 
 	scan_list = {}
 
-	scans = json.loads(requests.get(NESSUS_INSTANCE+"/scans", verify=False, headers=HEADERS).content)["scans"]
+	if FOLDER:
+		scans = json.loads(requests.get(NESSUS_INSTANCE + "/scans", verify=False, data={"folder_id":folderid},headers=HEADERS).content)["scans"]
+	else:
+		scans = json.loads(requests.get(NESSUS_INSTANCE+"/scans", verify=False, headers=HEADERS).content)["scans"]
 
 	for scan in scans:
 		if scan["status"] != "empty":
@@ -125,14 +134,50 @@ def download_file_request(name,id, file_request,format):
 				handle.write(chunk)
 
 
+def RetrieveFolderChoice():
+
+	folder_list = []
+	dump = json.loads(requests.get(NESSUS_INSTANCE+"/folders",verify=False,headers=HEADERS).content)["folders"]
+
+	for folder in dump:
+		if folder["type"] == "trash":
+			continue
+		else:
+			folder_list.append(folder)
+
+	print("="*len("NESSUS FOLDERs"))
+	print("NESSUS FOLDERS ")
+	print("="*len("NESSUS FOLDERS"))
+
+	for folder in folder_list:
+		print("ID [ %s  ] :: %s" %(folder["id"], folder["name"]))
+
+	found = False
+	while found is False:
+
+		choice = raw_input("Choose Folder ID: ")
+		for folder in folder_list:
+			if str(folder["id"]) == choice:
+				found = True
+
+		if found is False:
+			print("(!) Invalid Selection")
+
+	print("\n")
+	return choice
+
 def main():
 
 	global HEADERS
 
 	HEADERS = {"X-Cookie" : "token=%s" %nessus_login(),
 				"Content-Type" : "application/json"}
-	
-	scans = retrieve_scans()
+
+	if FOLDER:
+		scans = retrieve_scans(RetrieveFolderChoice())
+	else:
+		scans = retrieve_scans()
+
 	retrieve_export_request(scans)
 	print("\n[+] Downloads Complete")
 
