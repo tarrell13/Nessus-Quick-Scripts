@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .lib.core.hosts import Host
+from lib.core.hosts import Host
 import requests
 import json
 

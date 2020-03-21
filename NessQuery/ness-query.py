@@ -98,14 +98,20 @@ def usage():
     sys.exit()
 
 
+def GetCredentials():
+
+    username = input("Username: ")
+    password = getpass.getpass("Password: ")
+
+    return (username, password)
+
 def main():
 
     if len(sys.argv) < 2:
         usage()
 
     instance = sys.argv[1]
-    username = input("Username: ")
-    password = getpass.getpass("Password: ")
+    username , password = GetCredentials()
 
     user = User(instance, username=username,password=password)
     data = ParseData(user)
@@ -113,6 +119,7 @@ def main():
 
     while True:
         choice = input("\n[c]ritical :: [h]igh :: [m]edium :: [l]ow :: [i]nfo=> ")
+        choice = input("\n[c]ritical :: [h]igh :: [m]edium :: [l]ow :: [i]nfo :: [r]efresh => ")
         if choice.lower() in ["c","h","m","l","i"]:
             severity = choice.lower()
             output.TerminalOutput(data[severity], type=severity)
@@ -123,6 +130,16 @@ def main():
                 RetrievePluginIDList(data[severity],choice)
             else:
                 print("(!) Invalid Option or Plugin ID")
+        elif choice.lower() == "r":
+            if user.CheckTokenValidity():
+                print("[+] Refreshing Data...")
+                data = ParseData(user)
+                continue
+            else:
+                print("(!) Token Invalid Re-Authenticate")
+                username, password = GetCredentials()
+                user = User(instance, username=username, password=password)
+                data = ParseData(user)
         else:
             print("(!) Invalid Option")
 
