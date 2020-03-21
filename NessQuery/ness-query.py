@@ -112,7 +112,7 @@ def main():
     output = Output()
 
     while True:
-        choice = input("\n[c]ritical :: [h]igh :: [m]edium :: [l]ow :: [i]nfo => ")
+        choice = input("\n[c]ritical :: [h]igh :: [m]edium :: [l]ow :: [i]nfo=> ")
         if choice.lower() in ["c","h","m","l","i"]:
             severity = choice.lower()
             output.TerminalOutput(data[severity], type=severity)
