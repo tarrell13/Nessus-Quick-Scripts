@@ -38,3 +38,10 @@ class User(object):
             print("(!) Something went wrong")
             sys.exit()
 
+    def CheckTokenValidity(self):
+
+        response = json.loads(requests.get(self.instance+"/session", verify=False, headers=self.header).content)
+        if "error" in response.keys():
+            return False
+
+        return True
