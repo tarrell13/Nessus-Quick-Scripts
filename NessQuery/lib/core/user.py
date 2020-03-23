@@ -25,7 +25,7 @@ class User(object):
     def RetrieveToken(self):
 
         if self.username and self.password:
-            response = requests.post(self.instance+"/session", verify=False, data={"username":self.username, "password":self.password})
+            response = requests.post(self.instance+"/session", verify=False, timeout=10,data={"username":self.username, "password":self.password})
             if response.status_code == 200:
                 print("[+] Authentication Successful")
                 self.header["X-Cookie"] = "token="+json.loads(response.text)["token"]
