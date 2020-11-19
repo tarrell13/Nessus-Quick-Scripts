@@ -5,7 +5,7 @@ This script export all Nessus Scan reports in the following formats: CSV, HTML, 
 # Usage:
 
 ```
-python ness-exporter.py -h
+python3 ness-exporter.py -h
 usage: ness-exporter.py [-h] [-n NESSUS] [-p PATH]
 
 Script will download all scans in every format
@@ -23,7 +23,7 @@ optional arguments:
 ### Scan reports have been downloaded to the Downloads directory. In two (2) different formats.
 
 ```
-python ness-exporter.py -n https://localhost:8834 -p ~/Downloads/ -f nessus,html
+python3 ness-exporter.py -n https://localhost:8834 -p ~/Downloads/ -f nessus,html
 [*] Log into Nessus Instance => https://localhost:8834
 =========================================================
 [*] Username: user
@@ -51,7 +51,6 @@ NESSUS FOLDERS
 ID [ 3  ] :: My Scans
 ID [ 12  ] :: Test
 Choose Folder ID: 12
-
 
 [*] Save Directory: .
 [*] Formats => ['nessus', 'pdf', 'html', 'csv']
