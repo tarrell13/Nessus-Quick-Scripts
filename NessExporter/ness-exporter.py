@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 
 import argparse
@@ -117,19 +117,19 @@ def download_file_request(name,id, file_request,format):
     download = requests.get(NESSUS_INSTANCE+"/tokens/%s/download" %(str(file_request)), verify=False, headers=HEADERS)
 
     if format == "nessus":
-        with open(PATH+"/%s.nessus" %name, "wb") as handle:
+        with open(PATH+"/%s.nessus" %name.decode(), "wb") as handle:
             for chunk in download.iter_content(chunk_size=128):
                 handle.write(chunk)
     elif format == "html":
-        with open(PATH+"/%s.html" %name, "wb") as handle:
+        with open(PATH+"/%s.html" %name.decode(), "wb") as handle:
             for chunk in download.iter_content(chunk_size=128):
                 handle.write(chunk)
     elif format == "csv":
-        with open(PATH+"/%s.csv" %name, "wb") as handle:
+        with open(PATH+"/%s.csv" %name.decode(), "wb") as handle:
             for chunk in download.iter_content(chunk_size=128):
                 handle.write(chunk)
     elif format == "pdf":
-        with open(PATH+"/%s.pdf" %name, "wb") as handle:
+        with open(PATH+"/%s.pdf" %name.decode(), "wb") as handle:
             for chunk in download.iter_content(chunk_size=128):
                 handle.write(chunk)
 
